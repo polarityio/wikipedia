@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 var rest = require('unirest');
 var async = require('async');
 var utils = require('util');
@@ -38,9 +38,9 @@ var doLookup = function(entities, options, cb){
                             !page.extract.match(/^(To|From)[a-zA-Z ]+:/i))
                         {
                             entityResults.push({
-                                entity: entity.value,
+                                entity: _.capitalize(entity.value),
                                 data: {
-                                    entity_name: entity.value,
+                                    entity_name: _.capitalize(entity.value),
                                     tags: [ page.title ],
                                     details: page
                                 }
