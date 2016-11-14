@@ -8,6 +8,7 @@ var utils = require('util');
 var titleReg = /[^#<>\[\]|\{\}]+/;
 
 
+
 var doLookup = function(entities, options, cb){
     if(typeof cb !== 'function'){
         return;
@@ -24,7 +25,7 @@ var doLookup = function(entities, options, cb){
             !entity.isURL &&
             !entity.isHTMLTag &&
             !entity.isGeo){
-            rest.get("https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + _.startCase(_.toLower(entity.value)))
+            rest.get("https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + encodeURI(_.capitalize(_.toLower(entity.value))))
             .end(function(response){
                 if( _.isObject(response.body) && _.isObject(response.body.query)){
 
@@ -38,7 +39,7 @@ var doLookup = function(entities, options, cb){
                             !page.extract.match(/^(To|From)[a-zA-Z ]+:/i))
                         {
                             entityResults.push({
-                                entity: _.startCase(_.toLower(entity.value)),
+                                entity: _.capitalize(_.toLower(entity.value)),
                                 data: {
                                     entity_name: _.startCase(_.toLower(entity.value)),
                                     tags: [ page.title ],
