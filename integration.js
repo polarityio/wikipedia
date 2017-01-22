@@ -1,15 +1,22 @@
 'use strict';
-var _ = require('lodash');
-var rest = require('unirest');
-var async = require('async');
-var utils = require('util');
+let _ = require('lodash');
+let rest = require('unirest');
+let async = require('async');
+let utils = require('util');
 
+let Logger;
 //https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(technical_restrictions)
 var titleReg = /[^#<>\[\]|\{\}]+/;
 
 
 
+function startup(logger){
+    Logger = logger;
+}
+
+
 var doLookup = function(entities, options, cb){
+    Logger.info(entities);
     if(typeof cb !== 'function'){
         return;
     }
@@ -18,6 +25,7 @@ var doLookup = function(entities, options, cb){
 
 
     async.each(entities, function(entity, done){
+        Logger.info("Checking: " + entity.value);
                 if(titleReg.test(entity.value) &&
             !entity.isIP &&
             !entity.isHash &&
@@ -25,6 +33,7 @@ var doLookup = function(entities, options, cb){
             !entity.isURL &&
             !entity.isHTMLTag &&
             !entity.isGeo){
+                    Logger.info("Looking up: " + entity.value);
             rest.get("https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + encodeURI(_.capitalize(_.toLower(entity.value))))
             .end(function(response){
                 if( _.isObject(response.body) && _.isObject(response.body.query)){
@@ -39,48 +48,28 @@ var doLookup = function(entities, options, cb){
                             !page.extract.match(/^(To|From)[a-zA-Z ]+:/i))
                         {
                             entityResults.push({
-                                entity: _.capitalize(_.toLower(entity.value)),
+                                entity: entity,
+                                displayValue: _.capitalize(_.toLower(entity.value)),
                                 data: {
-                                    entity_name: _.startCase(_.toLower(entity.value)),
-                                    tags: [ page.title ],
+                                    summary: [ page.title ],
                                     details: page
                                 }
                             });
                         }
                     });
-
-                    console.log("===================================");
                     done();
                 }
             });
         }else{
             done();
         }
-
     },function(){
-        cb(null, entityResults.length, entityResults);
+        cb(null, entityResults);
     });
-
-
-
 };
-
-var doDetailedLookup = function(entities, cb){
-
-    var results = new Array();
-    entities.forEach(function(entity){
-        results.push({
-            entity: entity.value,
-            result: "Test integration enriched info"
-        })
-    });
-
-    cb(null, entities.length, results);
-};
-
 
 
 module.exports = {
     doLookup: doLookup,
-    doDetailedLookup: doDetailedLookup
+    startup: startup
 };
