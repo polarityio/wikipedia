@@ -1,0 +1,36 @@
+<div class="description">
+    <p>
+        {{#if block.data.details.para}}
+            {{block.data.details.para}}
+        {{/if}}
+    </p>
+</div>
+
+    <div class="lists">
+        <p>
+            <i class="fa fa-fw fa-globe"></i><span class="lists"> Related Searches</span>
+        </p>
+
+            <ul>
+                {{#if block.data.details.list1}}
+                    <li><a href="{{block.data.details.url1}}"> {{block.data.details.list1}}</a></li>
+                {{/if}}
+
+                {{#if block.data.details.list2}}
+                    <li><a href="{{block.data.details.url2}}"> {{block.data.details.list2}}</a></li>
+                {{/if}}
+
+                {{#if block.data.details.list3}}
+                    <li><a href="{{block.data.details.url3}}"> {{block.data.details.list3}}</a></li>
+                {{/if}}
+
+                {{#if block.data.details.list4}}
+                    <li><a href="{{block.data.details.url4}}"> {{block.data.details.list4}}</a></li>
+                {{/if}}
+
+                {{#if block.data.details.list4}}
+                    <li><a href="{{block.data.details.url4}}"> {{block.data.details.list4}}</a></li>
+                {{/if}}
+            </ul>
+
+    </div>

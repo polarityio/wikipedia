@@ -3,10 +3,10 @@ var _ = require('lodash');
 var rest = require('unirest');
 var async = require('async');
 var utils = require('util');
+var log = null;
 
 //https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(technical_restrictions)
 var titleReg = /[^#<>\[\]|\{\}]+/;
-
 
 
 var doLookup = function(entities, options, cb){
@@ -18,41 +18,42 @@ var doLookup = function(entities, options, cb){
 
 
     async.each(entities, function(entity, done){
-                if(titleReg.test(entity.value) &&
+        if(titleReg.test(entity.value) &&
             !entity.isIP &&
             !entity.isHash &&
             !entity.isEmail &&
             !entity.isURL &&
             !entity.isHTMLTag &&
+            !
             !entity.isGeo){
-            rest.get("https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + encodeURI(_.capitalize(_.toLower(entity.value))))
-            .end(function(response){
-                if( _.isObject(response.body) && _.isObject(response.body.query)){
+            rest.get("https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + entity.value)
+                .end(function(response){
+                    if( _.isObject(response.body) && _.isObject(response.body.query)){
 
-                    var resultsObject = response.body;
-                    var tags = new Array();
-                    var text = {};
-                    _.forEach(_.values(resultsObject.query.pages), function(page){
-                        if(_.has(page, "pageid") &&
-                            page.pageid > 0 &&
-                            page.extract != "" &&
-                            !page.extract.match(/^(To|From)[a-zA-Z ]+:/i))
-                        {
-                            entityResults.push({
-                                entity: _.capitalize(_.toLower(entity.value)),
-                                data: {
-                                    entity_name: _.startCase(_.toLower(entity.value)),
-                                    tags: [ page.title ],
-                                    details: page
-                                }
-                            });
-                        }
-                    });
+                        var resultsObject = response.body;
+                        var tags = new Array();
+                        var text = {};
+                        _.forEach(_.values(resultsObject.query.pages), function(page){
+                            if(_.has(page, "pageid") &&
+                                page.pageid > 0 &&
+                                page.extract != "" &&
+                                !page.extract.match(/^(To|From)[a-zA-Z ]+:/i))
+                            {
+                                entityResults.push({
+                                    entity: _.capitalize(entity.value),
+                                    data: {
+                                        entity_name: _.capitalize(entity.value),
+                                        summary: [ page.title ],
+                                        details: page
+                                    }
+                                });
+                            }
+                        });
 
-                    console.log("===================================");
-                    done();
-                }
-            });
+                        console.log("===================================");
+                        done();
+                    }
+                });
         }else{
             done();
         }
@@ -79,8 +80,14 @@ var doDetailedLookup = function(entities, cb){
 };
 
 
+function startup(logger) {
+    log = logger;
+
+}
+
 
 module.exports = {
     doLookup: doLookup,
     doDetailedLookup: doDetailedLookup
 };
+
