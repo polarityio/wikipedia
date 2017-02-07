@@ -12,10 +12,8 @@
         </p>
 
             <ul>
-			{{#for block.data.list as |item index|}}
-                {{#if block.data.details.resultCount >= index}}
-                    <li><a href="{{block.data.details.url[index]}}"> {{block.data.details.list[index]}}</a></li>
-                {{/if}}
+			{{#for block.data.details.relatedList as |item|}}
+                    <li><a href="{{item.link}}"> {{item.label}}</a></li>
 			{{/for}}
             </ul>
 
