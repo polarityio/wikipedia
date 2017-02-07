@@ -22,7 +22,7 @@ module.exports = {
                 "type"         : "text",
                 "userCanEdit"  : true,
                 "adminOnly"    : false
-            }
+            },
             {
                 "key"          : "resultCount",
                 "name"         : "Related list count",
