@@ -5,16 +5,17 @@
         {{/if}}
     </p>
 </div>
-
+{{#if block.data.details.relatedList}}
     <div class="lists">
         <p>
             <i class="fa fa-bold fa-wikipedia-w"></i><span class="lists"> Related Searches</span>
         </p>
 
             <ul>
-			{{#for block.data.details.relatedList as |item|}}
+			{{#each block.data.details.relatedList as |item|}}
                     <li><a href="{{item.link}}"> {{item.label}}</a></li>
-			{{/for}}
+			{{/each}}
             </ul>
 
     </div>
+{{/if}}

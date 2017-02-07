@@ -90,7 +90,7 @@ function _lookupEntity(entityObj, options, cb) {
             return;
         }
 
-        if (_.isUndefined(body) || _.isNull(body) || _.isNull(body[2]) || _.isEmpty(body[0]) ||_.isEmpty(body[1]) || _.isEmpty(body[2])) {
+        if (_.isUndefined(body) || _.isNull(body) || _.isNull(body[1]) || _.isEmpty(body[0]) ||_.isEmpty(body[1]) || _.isEmpty(body[2])) {
             return;
         }
 
@@ -105,11 +105,11 @@ function _lookupEntity(entityObj, options, cb) {
         else {   
 		
 			var relatedList = new Array();
-			for(var i = 0; i < body[1].length && i < resultCount; i++){
-				relatedList[] = {
-					"link": body[3],
-					"label": body[1]
-				}
+			for(var i = 1; i < body[1].length && i <= relatedCount; i++){
+				relatedList.push( {
+					"link": body[3][i],
+					"label": body[1][i]
+				});
 			}
 		
 			cb(null, {

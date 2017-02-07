@@ -24,8 +24,8 @@ module.exports = {
                 "adminOnly"    : false
             },
             {
-                "key"          : "resultCount",
-                "name"         : "Related list count",
+                "key"          : "relatedCount",
+                "name"         : "Related topics",
                 "description"  : "The number of related wiki topics to show.",
                 "default"      : "5",
                 "type"         : "text",
