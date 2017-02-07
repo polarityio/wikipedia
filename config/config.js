@@ -17,7 +17,7 @@ module.exports = {
             {
                 "key"          : "profile",
                 "name"         : "Search parameters",
-                "description"  : "Specify the search parameters for Wikipedia open Search. Options are: 'strict', 'normal', 'fuzzy', 'classic'",
+                "description"  : "Specify the search parameters for Wikipedia open Search. Options are: 'strict', 'normal', 'fuzzy' or 'classic'",
                 "default"      : "fuzzy",
                 "type"         : "text",
                 "userCanEdit"  : true,

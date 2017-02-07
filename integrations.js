@@ -15,22 +15,7 @@ function doLookup(entities, options, cb) {
     let lookupResults = [];
 
     async.each(entities, function (entityObj, next) {
-        if (entityObj.type == "string" &&
-            !entityObj.isIPv4 &&
-            !entityObj.isIP &&
-            !entityObj.Latitude &&
-            !entityObj.Longitude &&
-            !entityObj.isIPv6 &&
-            !entityObj.isHex &&
-            !entityObj.MD5 &&
-            !entityObj.SHA1 &&
-            !entityObj.SHA256 &&
-            !entityObj.SHA512 &&
-            !entityObj.isHash &&
-            !entityObj.isEmail &&
-            !entityObj.isURL &&
-            !entityObj.isHTMLTag &&
-            !entityObj.isGeo) {
+        if (entityObj.type == "string") {
             _lookupEntity(entityObj, options, function (err, result) {
                 if (err) {
                     next(err);
@@ -50,6 +35,36 @@ function doLookup(entities, options, cb) {
 
 
 
+
+var _createJsonErrorPayload = function (msg, pointer, httpCode, code, title, meta) {
+    return {
+        errors: [
+            _createJsonErrorObject(msg, pointer, httpCode, code, title, meta)
+        ]
+    }
+};
+
+// function that creates the Json object to be passed to the payload
+var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta) {
+    let error = {
+        detail: msg,
+        status: httpCode.toString(),
+        title: title,
+        code: 'Wiki_' + code.toString()
+    };
+
+    if (pointer) {
+        error.source = {
+            pointer: pointer
+        };
+    }
+
+    if (meta) {
+        error.meta = meta;
+    }
+
+    return error;
+};
 
 
 function _lookupEntity(entityObj, options, cb) {
@@ -74,7 +89,14 @@ function _lookupEntity(entityObj, options, cb) {
             return;
         }
 
-        if (_.isUndefined(body) || _.isNull(body) || _.isNull(body[1]) || _.isEmpty(body[0]) ||_.isEmpty(body[1])) {
+        if (_.isUndefined(body) || _.isNull(body) || _.isNull(body[1]) || _.isEmpty(body[0]) ||_.isEmpty(body[1]) || _.isEmpty(body[2])) {
+            return;
+        }
+
+        else if(_.includes(body, body.error)) {
+            done(_createJsonErrorPayload(body.error.info, null, '201', '2A', body.error.code, {
+                err: err
+            }));
             return;
         }
 
