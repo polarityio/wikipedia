@@ -23,5 +23,14 @@ module.exports = {
                 "userCanEdit"  : true,
                 "adminOnly"    : false
             }
+            {
+                "key"          : "resultCount",
+                "name"         : "Related list count",
+                "description"  : "The number of related wiki topics to show.",
+                "default"      : "5",
+                "type"         : "text",
+                "userCanEdit"  : true,
+                "adminOnly"    : false
+            }
         ]
 };

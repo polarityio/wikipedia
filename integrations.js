@@ -70,6 +70,7 @@ var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta
 function _lookupEntity(entityObj, options, cb) {
     let uri = 'https://en.wikipedia.org/w/api.php?action=opensearch&limit=5&namespace=0&format=json&search=' + entityObj.value + '&profile=' + options.profile;
     log.debug("Checking to see if the query executes %j", uri );
+	var relatedCount = (_.isNaN(options.relatedCount))? 5 : options.relatedCount;
 
     request({
         uri: uri,
@@ -89,7 +90,7 @@ function _lookupEntity(entityObj, options, cb) {
             return;
         }
 
-        if (_.isUndefined(body) || _.isNull(body) || _.isNull(body[1]) || _.isEmpty(body[0]) ||_.isEmpty(body[1]) || _.isEmpty(body[2])) {
+        if (_.isUndefined(body) || _.isNull(body) || _.isNull(body[2]) || _.isEmpty(body[0]) ||_.isEmpty(body[1]) || _.isEmpty(body[2])) {
             return;
         }
 
@@ -113,16 +114,9 @@ function _lookupEntity(entityObj, options, cb) {
                 // Data that you want to pass back to the notification window details block
                 details: {
                     para: body[2][0],
-                    list1: body[1][1],
-                    list2: body[1][2],
-                    list3: body[1][3],
-                    list4: body[1][4],
-                    list5: body[1][5],
-                    url1: body[3][1],
-                    url2: body[3][2],
-                    url3: body[3][3],
-                    url4: body[3][4],
-                    url5: body[3][5]
+					relatedCount: relatedCount,
+					list: body[1],
+					url: body[3],
                 }
             }
         }); }

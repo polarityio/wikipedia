@@ -12,25 +12,11 @@
         </p>
 
             <ul>
-                {{#if block.data.details.list1}}
-                    <li><a href="{{block.data.details.url1}}"> {{block.data.details.list1}}</a></li>
+			{{#for block.data.list as |item index|}}
+                {{#if block.data.details.resultCount >= index}}
+                    <li><a href="{{block.data.details.url[index]}}"> {{block.data.details.list[index]}}</a></li>
                 {{/if}}
-
-                {{#if block.data.details.list2}}
-                    <li><a href="{{block.data.details.url2}}"> {{block.data.details.list2}}</a></li>
-                {{/if}}
-
-                {{#if block.data.details.list3}}
-                    <li><a href="{{block.data.details.url3}}"> {{block.data.details.list3}}</a></li>
-                {{/if}}
-
-                {{#if block.data.details.list4}}
-                    <li><a href="{{block.data.details.url4}}"> {{block.data.details.list4}}</a></li>
-                {{/if}}
-
-                {{#if block.data.details.list4}}
-                    <li><a href="{{block.data.details.url4}}"> {{block.data.details.list4}}</a></li>
-                {{/if}}
+			{{/for}}
             </ul>
 
     </div>
