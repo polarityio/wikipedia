@@ -6,6 +6,7 @@ var async = require('async');
 var log = null;
 var entityNoSpecialChars = /^[^#<>\[\]|\{\}\/:]+$/;
 var entityNotGeo = /[\d\s]+,[\d\s]+/;
+var wikiRedirect = /^((To|From)[a-zA-Z ]+:)|([\w\s]+may refer to:)/i
 
 var validSearchProfiles = ['strict', 'normal', 'fuzzy', 'classic'];
 
@@ -115,7 +116,7 @@ var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta
 
 
 function _lookupEntity(entityObj, options, cb) {
-    var relatedCount = ( _.isNaN(options.relatedCount) )? 5 : (parseInt(options.relatedCount) + 1);
+    var relatedCount = parseInt(options.relatedCount) + 1;
     let uri = 'https://en.wikipedia.org/w/api.php?action=opensearch&limit='+relatedCount+'&namespace=0&format=json&search=' + entityObj.value + '&profile=' + options.profile;
     log.debug("Checking to see if the query executes %j", uri );
 
@@ -150,7 +151,7 @@ function _lookupEntity(entityObj, options, cb) {
             }));
                 return;
         
-        } else if( body[2].length == 0){
+        } else if( body[2].length == 0 || wikiRedirect.test(body[2][0]) ){
             cb(null, {entity: entityObj, data:null});
             return;
 
