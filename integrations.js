@@ -7,12 +7,55 @@ var log = null;
 var entityNoSpecialChars = /^[^#<>\[\]|\{\}\/:]+$/;
 var entityNotGeo = /[\d\s]+,[\d\s]+/;
 
+var validSearchProfiles = ['strict', 'normal', 'fuzzy', 'classic'];
+
 function startup(logger) {
     log = logger;
 }
 
 
+function _validateOptions(options){
+    var errors = [];
+
+    if(typeof(options.profile.value) != "string" ||
+       validSearchProfiles.indexOf(options.profile.value) < 0
+    ){
+         errors.push({
+              key: "profile",
+              message: "Search must be either 'strict', 'normal', 'fuzzy' or 'classic'"
+         });
+    }
+
+    var relatedCount = parseInt(options.relatedCount.value);
+    if( _.isNaN(relatedCount)  || relatedCount < 0){
+        errors.push({
+             key: "relatedCount",
+             message: "Related list count must be an integer 0 or greater."
+        });
+    }
+
+    return errors;
+}
+
+function validateOptions(options, cb){
+
+
+    cb(null, _validateOptions(options));
+}
+
+
 function doLookup(entities, options, cb) {
+    var errors = _validateOptions(options);
+    if(   _.isNaN(options.relatedCount) || parseInt(options.relatedCount) < 0 ||
+            options.profile == "string" || validSearchProfiles.indexOf(options.profile) < 0
+    ){
+        cb( _createJsonErrorPayload("Currently configured options are not valid.", null, '201', '2A', "Invalid Options", {
+              err: errors
+          }));
+
+        return;
+    }
+
     let entitiesWithNoData = [];
     let lookupResults = [];
 
@@ -149,7 +192,8 @@ function _lookupEntity(entityObj, options, cb) {
 
 module.exports = {
     startup:startup,
-    doLookup: doLookup
+    doLookup: doLookup,
+    validateOptions: validateOptions
 };
 
 
