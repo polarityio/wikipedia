@@ -1,7 +1,7 @@
 module.exports = {
     "name": "Wikipedia",
     "acronym": "Wiki",
-    "logging": { level: 'debug'},
+    "logging": { level: 'info'},
     "styles": [
         "./styles/wiki.less"
     ],
