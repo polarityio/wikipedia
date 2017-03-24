@@ -34,7 +34,7 @@ You can install an integration by downloading the file from github, or by using 
 
 ### Install from Zip/Tar File
 
-1. Click on the `Releases` link near the top of the polarityio/wikipedia GitHub page.
+1. Navigate to the [polarityio/wikipedia releases page](https://github.com/polarityio/wikipedia/releases).
 2. Download the `tar.gz` file for the version of the integration you want to install (we typically recommend installing the latest version of the integration).
 3. Upload the `tar.gz` file to your Polarity Server.
 4. Move the `tar.gz` file to the Polarity Server integrations directory.
