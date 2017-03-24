@@ -1,6 +1,6 @@
 # Polarity Wikipedia Integration
 
-Polarity's Wikipedia integration gives users access
+Polarity's Wikipedia integration gives users access to a short description of Wikipedia entries that match a tagged entity.
 
 > Note that in order for the Wikipedia Integration to execute a query, an entity needs to be tagged in the Polarity Platform.  
 
@@ -8,23 +8,23 @@ Polarity's Wikipedia integration gives users access
 
 There are two main settings in the Wikipedia integration:
 
-#### Search Profile
+### Search Profile
 
 Accepts a text string for one of the four support search profiles.  Valid values are:
 
-**fuzzy** 
+#### fuzzy
 Default search, supports typo correction.
 
-**strict**
+#### strict
 Few punctuation characters are removed but diacritics and stress marks are kept in search.
 
-**normal**
+#### normal
 Allows few punctuation characters, some diacritics and stop words are removed.
 
-**classic**
+#### classic
 Few punctuation characters and some diacritics removed.
    
-#### Related Topics
+### Related Topics
 
 This setting allows the user to establish the number of related topics they want to display in relation to the entity that was queried in Wikipedia.
 
@@ -34,7 +34,7 @@ You can install an integration by downloading the file from github, or by using 
 
 ### Install from Zip/Tar File
 
-1. Click on the `Releases` link near the top of the polarityio/Wikipedia GitHub page.
+1. Click on the `Releases` link near the top of the polarityio/wikipedia GitHub page.
 2. Download the `tar.gz` file for the version of the integration you want to install (we typically recommend installing the latest version of the integration).
 3. Upload the `tar.gz` file to your Polarity Server.
 4. Move the `tar.gz` file to the Polarity Server integrations directory.
@@ -70,7 +70,7 @@ npm install
 8. Ensure the integration directory is owned by the `polarityd` user
  
  ```bash
-chown -R polarityd:polarityd /app/polarity-server/integrations/CRITs
+chown -R polarityd:polarityd /app/polarity-server/integrations/wikipedia
 ```
 
 9. Restart your Polarity-Server
@@ -89,16 +89,16 @@ service polarityd restart
 cd /app/polarity-server/integrations
 ```
 
-2. Clone a specific version of the CRITs repo using git:
+2. Clone a specific version of the wikipedia repo using git:
 
  ```bash
-git clone --branch <version> https://github.com/polarityio/CRITs.git
+git clone --branch <version> https://github.com/polarityio/wikipedia.git
 ```
 
 3. Change into the integration directory
 
  ```bash
-cd CRITs
+cd wikipedia
 ```
 
 4. Use `npm` to install the integration's dependencies
@@ -110,7 +110,7 @@ npm install
 5.  Ensure the integration directory is owned by the `polarityd` user
 
  ```bash
-chown -R polarityd:polarityd /app/polarity-server/integrations/CRITs
+chown -R polarityd:polarityd /app/polarity-server/integrations/wikipedia
 ```
 
 6. Restart your Polarity-Server
