@@ -1,26 +1,70 @@
 'use strict';
 
-var request = require('request');
-var _ = require('lodash');
-var async = require('async');
-var log = null;
+let request = require('request');
+let _ = require('lodash');
+let async = require('async');
+let log = null;
+let entityNoSpecialChars = /^[^#<>\[\]|\{\}\/:]+$/;
+let entityNotGeo = /[\d\s]+,[\d\s]+/;
+let wikiRedirect = /^((To|From)[a-zA-Z ]+:)|([\w\s]+may refer to:)/i;
+
+const VALID_SEARCH_PROFILES = ['strict', 'normal', 'fuzzy', 'classic'];
 
 function startup(logger) {
     log = logger;
 }
 
+function _validateOptions(options) {
+    let errors = [];
+
+    if (typeof(options.profile.value) != "string" ||
+        VALID_SEARCH_PROFILES.indexOf(options.profile.value) < 0
+    ) {
+        errors.push({
+            key: "profile",
+            message: "Search Profile must be either 'strict', 'normal', 'fuzzy' or 'classic'"
+        });
+    }
+
+    let relatedCount = parseInt(options.relatedCount.value);
+    if (_.isNaN(relatedCount) || relatedCount < 0) {
+        errors.push({
+            key: "relatedCount",
+            message: "Related Topics must be an integer greater than or equal to 0"
+        });
+    }
+
+    return errors;
+}
+
+function validateOptions(options, cb) {
+    cb(null, _validateOptions(options));
+}
 
 function doLookup(entities, options, cb) {
-    let entitiesWithNoData = [];
+    let errors = _validateOptions(options);
+
+    if (_.isNaN(options.relatedCount) || parseInt(options.relatedCount) < 0 ||
+        options.profile == "string" || VALID_SEARCH_PROFILES.indexOf(options.profile) < 0
+    ) {
+        cb(_createJsonErrorPayload("Currently configured options are not valid.", null, '400', '2A', "Invalid Options", {
+            err: errors
+        }));
+
+        return;
+    }
+
     let lookupResults = [];
 
-    async.each(entities, function (entityObj, next) {
-        if (entityObj.type == "string") {
+    async.eachLimit(entities, 20, function (entityObj, next) {
+        if (entityObj.type == "string" &&
+            entityNoSpecialChars.test(entityObj.value) && !entityNotGeo.test(entityObj.value)) {
             _lookupEntity(entityObj, options, function (err, result) {
                 if (err) {
                     next(err);
                 } else {
-                    lookupResults.push(result); log.debug("Printing out the Results %j", result);
+                    lookupResults.push(result);
+                    log.debug("Printing out the Results %j", result);
                     next(null);
                 }
             });
@@ -34,18 +78,15 @@ function doLookup(entities, options, cb) {
 }
 
 
-
-
-var _createJsonErrorPayload = function (msg, pointer, httpCode, code, title, meta) {
+function _createJsonErrorPayload(msg, pointer, httpCode, code, title, meta) {
     return {
         errors: [
             _createJsonErrorObject(msg, pointer, httpCode, code, title, meta)
         ]
     }
-};
+}
 
-// function that creates the Json object to be passed to the payload
-var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta) {
+function _createJsonErrorObject(msg, pointer, httpCode, code, title, meta) {
     let error = {
         detail: msg,
         status: httpCode.toString(),
@@ -64,12 +105,15 @@ var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta
     }
 
     return error;
-};
+}
 
 
 function _lookupEntity(entityObj, options, cb) {
-    let uri = 'https://en.wikipedia.org/w/api.php?action=opensearch&limit=5&namespace=0&format=json&search=' + entityObj.value + '&profile=' + options.profile;
-    log.debug("Checking to see if the query executes %j", uri );
+    let relatedCount = parseInt(options.relatedCount) + 1;
+    let uri = 'https://en.wikipedia.org/w/api.php?action=opensearch&limit=' + relatedCount +
+        '&namespace=0&format=json&search=' + entityObj.value + '&profile=' + options.profile;
+
+    log.debug({uri: uri}, "Checking to see if the query executes");
 
     request({
         uri: uri,
@@ -82,59 +126,62 @@ function _lookupEntity(entityObj, options, cb) {
             return;
         }
 
-        log.debug("Printing out Body %j", body);
+        log.debug({body:body}, "REST Response Body");
 
-        if (response.statusCode !== 200) {
-            cb(body);
-            return;
-        }
+        if (response.statusCode !== 200 ||
+            _.isUndefined(body) ||
+            _.isNull(body) || !_.isArray(body) ||
+            body.length < 4
+        ) {
+            let title = "Unexpected result format";
+            let code = "Format error";
 
-        if (_.isUndefined(body) || _.isNull(body) || _.isNull(body[1]) || _.isEmpty(body[0]) ||_.isEmpty(body[1]) || _.isEmpty(body[2])) {
-            return;
-        }
-
-        else if(_.includes(body, body.error)) {
-            done(_createJsonErrorPayload(body.error.info, null, '201', '2A', body.error.code, {
-                err: err
-            }));
-            return;
-        }
-
-        // The lookup results returned is an array of lookup objects with the following format
-        else {   cb(null, {
-            // Required: This is the entity object passed into the integration doLookup method
-            entity: entityObj,
-            // Required: An object containing everything you want passed to the template
-            data: {
-                // Required: this is the string value that is displayed in the template
-                entity_name: entityObj.value,
-                // Required: These are the tags that are displayed in your template
-                summary: [body[0]],
-                // Data that you want to pass back to the notification window details block
-                details: {
-                    para: body[2][0],
-                    list1: body[1][1],
-                    list2: body[1][2],
-                    list3: body[1][3],
-                    list4: body[1][4],
-                    list5: body[1][5],
-                    url1: body[3][1],
-                    url2: body[3][2],
-                    url3: body[3][3],
-                    url4: body[3][4],
-                    url5: body[3][5]
-                }
+            if (_.includes(body, body.error)) {
+                title = body.error.info;
+                code = body.error.code;
             }
-        }); }
 
+            cb(_createJsonErrorPayload(title, null, '500', '2A', code, {
+                err: body
+            }));
+        } else if (body[2].length == 0 || wikiRedirect.test(body[2][0])) {
+            cb(null, {entity: entityObj, data: null});
+        } else {
+            // The lookup results returned is an array of lookup objects with the following format
+
+            let relatedList = [];
+
+            for (let i = 1; i < body[1].length; i++) {
+                relatedList.push({
+                    "link": body[3][i],
+                    "label": body[1][i]
+                });
+            }
+
+            cb(null, {
+                // Required: This is the entity object passed into the integration doLookup method
+                entity: entityObj,
+                // Required: An object containing everything you want passed to the template
+                data: {
+                    // Required: These are the tags that are displayed in your template
+                    summary: [body[0]],
+                    // Data that you want to pass back to the notification window details block
+                    details: {
+                        para: body[2][0],
+                        relatedCount: relatedCount,
+                        relatedList: relatedList
+                    }
+                }
+            });
+        }
     });
 }
 
 
-
 module.exports = {
-    startup:startup,
-    doLookup: doLookup
+    startup: startup,
+    doLookup: doLookup,
+    validateOptions: validateOptions
 };
 
 

@@ -7,7 +7,7 @@ module.exports = {
     ],
     "block": {
         "component": {
-            "file": "./components/block.js"
+            "file": "./components/wiki.js"
         },
         "template": {
             "file": "./template/wiki.hbs"
@@ -16,9 +16,18 @@ module.exports = {
     "options":[
             {
                 "key"          : "profile",
-                "name"         : "Search parameters",
-                "description"  : "Specify the search parameters for Wikipedia open Search. Options are: 'strict', 'normal', 'fuzzy' or 'classic'",
+                "name"         : "Search Profile",
+                "description"  : "Specify the search profile for Wikipedia Open Search. Options are: 'strict', 'normal', 'fuzzy' or 'classic'",
                 "default"      : "fuzzy",
+                "type"         : "text",
+                "userCanEdit"  : true,
+                "adminOnly"    : false
+            },
+            {
+                "key"          : "relatedCount",
+                "name"         : "Related Topics",
+                "description"  : "The number of related wiki topics to show.",
+                "default"      : "5",
                 "type"         : "text",
                 "userCanEdit"  : true,
                 "adminOnly"    : false

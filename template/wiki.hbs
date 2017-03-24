@@ -5,32 +5,17 @@
         {{/if}}
     </p>
 </div>
-
+{{#if block.data.details.relatedList}}
     <div class="lists">
         <p>
             <i class="fa fa-bold fa-wikipedia-w"></i><span class="lists"> Related Searches</span>
         </p>
 
             <ul>
-                {{#if block.data.details.list1}}
-                    <li><a href="{{block.data.details.url1}}"> {{block.data.details.list1}}</a></li>
-                {{/if}}
-
-                {{#if block.data.details.list2}}
-                    <li><a href="{{block.data.details.url2}}"> {{block.data.details.list2}}</a></li>
-                {{/if}}
-
-                {{#if block.data.details.list3}}
-                    <li><a href="{{block.data.details.url3}}"> {{block.data.details.list3}}</a></li>
-                {{/if}}
-
-                {{#if block.data.details.list4}}
-                    <li><a href="{{block.data.details.url4}}"> {{block.data.details.list4}}</a></li>
-                {{/if}}
-
-                {{#if block.data.details.list4}}
-                    <li><a href="{{block.data.details.url4}}"> {{block.data.details.list4}}</a></li>
-                {{/if}}
+			{{#each block.data.details.relatedList as |item|}}
+                    <li><a href="{{item.link}}"> {{item.label}}</a></li>
+			{{/each}}
             </ul>
 
     </div>
+{{/if}}
