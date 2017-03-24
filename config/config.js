@@ -7,7 +7,7 @@ module.exports = {
     ],
     "block": {
         "component": {
-            "file": "./components/block.js"
+            "file": "./components/wiki.js"
         },
         "template": {
             "file": "./template/wiki.hbs"
