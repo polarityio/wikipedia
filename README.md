@@ -2,6 +2,10 @@
 
 Polarity's Wikipedia integration gives users access to a short description of Wikipedia entries that match a tagged entity.
 
+| ![image](https://cloud.githubusercontent.com/assets/306319/24308096/0ecde926-109d-11e7-87e6-4b2e891afe11.png) |
+|---|
+|*Wikipedia Lookup of Tagged Entity* |
+
 > Note that in order for the Wikipedia Integration to execute a query, an entity needs to be tagged in the Polarity Platform.  
 
 ## Wikipedia Settings

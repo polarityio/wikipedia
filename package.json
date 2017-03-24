@@ -2,7 +2,7 @@
   "main": "./integrations.js",
   "name": "Wikipedia",
   "description": "Lookup pages in Wikipedia to find contextual information in summaries.",
-  "version": "1.0.2-beta",
+  "version": "1.0.3-beta",
   "private": true,
   "dependencies": {
     "request": "^2.75",
