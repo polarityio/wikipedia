@@ -1,37 +1,36 @@
 'use strict';
 
-var request = require('request');
-var _ = require('lodash');
-var async = require('async');
-var log = null;
-var entityNoSpecialChars = /^[^#<>\[\]|\{\}\/:]+$/;
-var entityNotGeo = /[\d\s]+,[\d\s]+/;
-var wikiRedirect = /^((To|From)[a-zA-Z ]+:)|([\w\s]+may refer to:)/i
+let request = require('request');
+let _ = require('lodash');
+let async = require('async');
+let log = null;
+let entityNoSpecialChars = /^[^#<>\[\]|\{\}\/:]+$/;
+let entityNotGeo = /[\d\s]+,[\d\s]+/;
+let wikiRedirect = /^((To|From)[a-zA-Z ]+:)|([\w\s]+may refer to:)/i;
 
-var validSearchProfiles = ['strict', 'normal', 'fuzzy', 'classic'];
+const VALID_SEARCH_PROFILES = ['strict', 'normal', 'fuzzy', 'classic'];
 
 function startup(logger) {
     log = logger;
 }
 
-
 function _validateOptions(options) {
-    var errors = [];
+    let errors = [];
 
     if (typeof(options.profile.value) != "string" ||
-        validSearchProfiles.indexOf(options.profile.value) < 0
+        VALID_SEARCH_PROFILES.indexOf(options.profile.value) < 0
     ) {
         errors.push({
             key: "profile",
-            message: "Search must be either 'strict', 'normal', 'fuzzy' or 'classic'"
+            message: "Search Profile must be either 'strict', 'normal', 'fuzzy' or 'classic'"
         });
     }
 
-    var relatedCount = parseInt(options.relatedCount.value);
+    let relatedCount = parseInt(options.relatedCount.value);
     if (_.isNaN(relatedCount) || relatedCount < 0) {
         errors.push({
             key: "relatedCount",
-            message: "Related list count must be an integer 0 or greater."
+            message: "Related Topics must be an integer greater than or equal to 0"
         });
     }
 
@@ -42,20 +41,19 @@ function validateOptions(options, cb) {
     cb(null, _validateOptions(options));
 }
 
-
 function doLookup(entities, options, cb) {
-    var errors = _validateOptions(options);
+    let errors = _validateOptions(options);
+
     if (_.isNaN(options.relatedCount) || parseInt(options.relatedCount) < 0 ||
-        options.profile == "string" || validSearchProfiles.indexOf(options.profile) < 0
+        options.profile == "string" || VALID_SEARCH_PROFILES.indexOf(options.profile) < 0
     ) {
-        cb(_createJsonErrorPayload("Currently configured options are not valid.", null, '201', '2A', "Invalid Options", {
+        cb(_createJsonErrorPayload("Currently configured options are not valid.", null, '400', '2A', "Invalid Options", {
             err: errors
         }));
 
         return;
     }
 
-    let entitiesWithNoData = [];
     let lookupResults = [];
 
     async.eachLimit(entities, 20, function (entityObj, next) {
@@ -80,16 +78,15 @@ function doLookup(entities, options, cb) {
 }
 
 
-var _createJsonErrorPayload = function (msg, pointer, httpCode, code, title, meta) {
+function _createJsonErrorPayload(msg, pointer, httpCode, code, title, meta) {
     return {
         errors: [
             _createJsonErrorObject(msg, pointer, httpCode, code, title, meta)
         ]
     }
-};
+}
 
-// function that creates the Json object to be passed to the payload
-var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta) {
+function _createJsonErrorObject(msg, pointer, httpCode, code, title, meta) {
     let error = {
         detail: msg,
         status: httpCode.toString(),
@@ -108,15 +105,15 @@ var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta
     }
 
     return error;
-};
+}
 
 
 function _lookupEntity(entityObj, options, cb) {
-    var relatedCount = parseInt(options.relatedCount) + 1;
+    let relatedCount = parseInt(options.relatedCount) + 1;
     let uri = 'https://en.wikipedia.org/w/api.php?action=opensearch&limit=' + relatedCount +
         '&namespace=0&format=json&search=' + entityObj.value + '&profile=' + options.profile;
 
-    log.debug("Checking to see if the query executes %j", uri);
+    log.debug({uri: uri}, "Checking to see if the query executes");
 
     request({
         uri: uri,
@@ -129,36 +126,32 @@ function _lookupEntity(entityObj, options, cb) {
             return;
         }
 
-        log.debug("Printing out Body %j", body);
+        log.debug({body:body}, "REST Response Body");
 
         if (response.statusCode !== 200 ||
             _.isUndefined(body) ||
             _.isNull(body) || !_.isArray(body) ||
             body.length < 4
         ) {
-            var title = "Unexpected result format";
-            var code = "Format error";
+            let title = "Unexpected result format";
+            let code = "Format error";
 
             if (_.includes(body, body.error)) {
                 title = body.error.info;
                 code = body.error.code;
             }
 
-            cb(_createJsonErrorPayload(title, null, '201', '2A', code, {
+            cb(_createJsonErrorPayload(title, null, '500', '2A', code, {
                 err: body
             }));
-            return;
-
         } else if (body[2].length == 0 || wikiRedirect.test(body[2][0])) {
             cb(null, {entity: entityObj, data: null});
-            return;
-        }
+        } else {
+            // The lookup results returned is an array of lookup objects with the following format
 
-        // The lookup results returned is an array of lookup objects with the following format
-        else {
-            var relatedList = new Array();
+            let relatedList = [];
 
-            for (var i = 1; i < body[1].length; i++) {
+            for (let i = 1; i < body[1].length; i++) {
                 relatedList.push({
                     "link": body[3][i],
                     "label": body[1][i]
