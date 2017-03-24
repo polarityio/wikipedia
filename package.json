@@ -1,13 +1,13 @@
 {
-"main": "./integrations.js",
-"name": "Wikipedia",
-"description": "Lookup pages in Wikipedia to find contextual information in summaries.",
-"version": "0.0.3",
-"private": true,
-"dependencies": {
-"request": "^2.75",
-"lodash": "^4.16",
-"async": "^2.0",
-"unirest": "^0.5.0"
-}
+  "main": "./integrations.js",
+  "name": "Wikipedia",
+  "description": "Lookup pages in Wikipedia to find contextual information in summaries.",
+  "version": "0.0.3",
+  "private": true,
+  "dependencies": {
+    "request": "^2.75",
+    "lodash": "^4.16",
+    "async": "^2.0",
+    "unirest": "^0.5.0"
+  }
 }
