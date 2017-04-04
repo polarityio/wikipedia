@@ -5,6 +5,7 @@ module.exports = {
     "styles": [
         "./styles/wiki.less"
     ],
+    "entityTypes": ['string'],
     "block": {
         "component": {
             "file": "./components/wiki.js"
