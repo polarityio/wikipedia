@@ -144,7 +144,7 @@ function _lookupEntity(entityObj, options, cb) {
             cb(_createJsonErrorPayload(title, null, '500', '2A', code, {
                 err: body
             }));
-        } else if (body[2].length == 0 || wikiRedirect.test(body[2][0])) {
+        } else if (body[2].length == 0 || wikiRedirect.test(body[2][0]) || body[2][0].length == 0) {
             cb(null, {entity: entityObj, data: null});
         } else {
             // The lookup results returned is an array of lookup objects with the following format
@@ -158,13 +158,16 @@ function _lookupEntity(entityObj, options, cb) {
                 });
             }
 
+            log.debug({para: body[2][0]}, "checking the paragraph");
+
             cb(null, {
                 // Required: This is the entity object passed into the integration doLookup method
                 entity: entityObj,
+                displayValue: body[1][0],
                 // Required: An object containing everything you want passed to the template
                 data: {
                     // Required: These are the tags that are displayed in your template
-                    summary: [body[0]],
+                    summary: [body[1][0]],
                     // Data that you want to pass back to the notification window details block
                     details: {
                         para: body[2][0],
