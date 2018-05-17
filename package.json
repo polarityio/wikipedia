@@ -5,8 +5,8 @@
   "version": "1.0.5-beta",
   "private": true,
   "dependencies": {
-    "request": "^2.75",
-    "lodash": "^4.16",
-    "async": "^2.0"
+    "request": "^2.86",
+    "lodash": "^4.17",
+    "async": "^2.6"
   }
 }
