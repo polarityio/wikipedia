@@ -136,8 +136,11 @@ function _lookupEntity(entityObj, options, cb) {
             let title = "Unexpected result format";
             let code = "Format error";
 
-            if (_.includes(body, body.error)) {
+            if (_.has(body, 'error.info')) {
                 title = body.error.info;
+            }
+
+            if(_.has(body, 'error.code')){
                 code = body.error.code;
             }
 
