@@ -149,7 +149,11 @@ function _lookupEntity(entityObj, options, cb) {
     }, function (err, response, body) {
         // check for an error
         if (err) {
-            cb(err);
+            log.error({err:err}, 'Error executing HTTP request');
+            cb({
+                detail: 'Error executing HTTP request',
+                err
+            });
             return;
         }
 
