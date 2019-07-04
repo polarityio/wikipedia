@@ -7,6 +7,12 @@
   "dependencies": {
     "request": "^2.86",
     "lodash": "^4.17",
-    "async": "^2.6"
-  }
+    "async": "^2.6",
+    "snyk": "^1.189.0"
+  },
+  "scripts": {
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
