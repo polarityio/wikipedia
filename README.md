@@ -2,7 +2,7 @@
 
 Polarity's Wikipedia integration gives users access to a short description of Wikipedia entries that match a tagged entity.
 
-| ![image](https://cloud.githubusercontent.com/assets/306319/24308096/0ecde926-109d-11e7-87e6-4b2e891afe11.png) |
+| ![image](https://user-images.githubusercontent.com/22529325/76760849-c9e77080-6764-11ea-821a-f6b876b28d56.png) |
 |---|
 |*Wikipedia Lookup of Tagged Entity* |
 
