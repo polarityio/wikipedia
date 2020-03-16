@@ -161,8 +161,7 @@ function _lookupEntity(entityObj, options, cb) {
 
         if (response.statusCode !== 200 ||
             _.isUndefined(body) ||
-            _.isNull(body) || !_.isArray(body) ||
-            body.length < 4
+            _.isNull(body) || !_.isArray(body)
         ) {
             let title = "Unexpected result format";
             let code = "Format error";
@@ -174,15 +173,14 @@ function _lookupEntity(entityObj, options, cb) {
             if(_.has(body, 'error.code')){
                 code = body.error.code;
             }
-
             cb(_createJsonErrorPayload(title, null, '500', '2A', code, {
                 err: body
             }));
-        } else if (body[2].length == 0 || wikiRedirect.test(body[2][0]) || body[2][0].length == 0) {
+        } else if (body[3].length == 0) {
             cb(null, {entity: entityObj, data: null});
         } else {
             // The lookup results returned is an array of lookup objects with the following format
-
+                log.trace({body:body}, "Checkign to see if it made it past the error handling");
             let relatedList = [];
 
             for (let i = 1; i < body[1].length; i++) {
@@ -192,7 +190,7 @@ function _lookupEntity(entityObj, options, cb) {
                 });
             }
 
-            log.debug({para: body[2][0]}, "checking the paragraph");
+            //log.debug({para: body[2][0]}, "checking the paragraph");
 
             cb(null, {
                 // Required: This is the entity object passed into the integration doLookup method
@@ -204,7 +202,6 @@ function _lookupEntity(entityObj, options, cb) {
                     summary: [body[1][0]],
                     // Data that you want to pass back to the notification window details block
                     details: {
-                        para: body[2][0],
                         relatedCount: relatedCount,
                         relatedList: relatedList
                     }
