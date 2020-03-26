@@ -1,11 +1,8 @@
-
 {{#if block.data.details.relatedList}}
-    <div>
-  <span class="p-title">{{fa-icon "wikipedia-w" fixedWidth=true}} Related Searches in Wiki</span>
-    </div>
-    <div>
-		{{#each block.data.details.relatedList as |item|}}
-                <li><a href="{{item.link}}"> {{item.label}}</a></li>
-		{{/each}}
-    </div>
+  <h1 class="p-title">{{fa-icon "link" fixedWidth=true}} Related Searches on Wikipedia</h1>
+  <ul class="link-list">
+    {{#each block.data.details.relatedList as |item|}}
+      <li><a class="p-link" href="{{item.link}}">{{item.label}}</a></li>
+    {{/each}}
+  </ul>
 {{/if}}
