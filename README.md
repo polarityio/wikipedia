@@ -2,7 +2,7 @@
 
 Polarity's Wikipedia integration gives users access to a list of searches related to a tagged entity.
 
-| ![image](https://user-images.githubusercontent.com/22529325/76760849-c9e77080-6764-11ea-821a-f6b876b28d56.png) |
+| ![image](./assets/overlay.png) |
 |---|
 |*Wikipedia Lookup of Tagged Entity* |
 
