@@ -41,8 +41,30 @@ module.exports = {
       name: 'Search Profile',
       description:
         "Specify the search profile for Wikipedia Open Search. Options are: 'strict', 'normal', 'fuzzy' or 'classic'",
-      default: 'fuzzy',
-      type: 'text',
+      default: {
+        value: 'strict',
+        display: 'Strict'
+      },
+      type: 'select',
+      options: [
+        {
+          value: 'strict',
+          display: 'Strict'
+        },
+        {
+          value: 'normal',
+          display: 'Normal'
+        },
+        {
+          value: 'fuzzy',
+          display: 'Fuzzy'
+        },
+        {
+          value: 'classic',
+          display: 'Classic'
+        }
+      ],
+      multiple: false,
       userCanEdit: true,
       adminOnly: false
     },
@@ -50,8 +72,8 @@ module.exports = {
       key: 'relatedCount',
       name: 'Related Topics',
       description: 'The number of related wiki topics to show.',
-      default: '5',
-      type: 'text',
+      default: 5,
+      type: 'number',
       userCanEdit: true,
       adminOnly: false
     }

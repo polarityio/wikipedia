@@ -6,13 +6,17 @@ const config = require('./config/config.js');
 const fs = require('fs');
 const async = require('async');
 
+const FIELDS = {
+  search_term: 0,
+  matches: 1,
+  links: 3
+};
+
 let log = null;
 let entityNoSpecialChars = /^[^#<>\[\]|\{\}\/:]+$/;
 let entityNotGeo = /[\d\s]+,[\d\s]+/;
 let wikiRedirect = /^((To|From)[a-zA-Z ]+:)|([\w\s]+may refer to:)/i;
 let requestWithDefaults;
-
-const VALID_SEARCH_PROFILES = ['strict', 'normal', 'fuzzy', 'classic'];
 
 function startup(logger) {
   log = logger;
@@ -48,14 +52,7 @@ function startup(logger) {
 function _validateOptions(options) {
   let errors = [];
 
-  if (typeof options.profile.value != 'string' || VALID_SEARCH_PROFILES.indexOf(options.profile.value) < 0) {
-    errors.push({
-      key: 'profile',
-      message: "Search Profile must be either 'strict', 'normal', 'fuzzy' or 'classic'"
-    });
-  }
-
-  let relatedCount = parseInt(options.relatedCount.value);
+  let relatedCount = options.relatedCount.value;
   if (_.isNaN(relatedCount) || relatedCount < 0) {
     errors.push({
       key: 'relatedCount',
@@ -71,24 +68,7 @@ function validateOptions(options, cb) {
 }
 
 function doLookup(entities, options, cb) {
-  let errors = _validateOptions(options);
-
-  if (
-    _.isNaN(options.relatedCount) ||
-    parseInt(options.relatedCount) < 0 ||
-    options.profile == 'string' ||
-    VALID_SEARCH_PROFILES.indexOf(options.profile) < 0
-  ) {
-    cb(
-      _createJsonErrorPayload('Currently configured options are not valid.', null, '400', '2A', 'Invalid Options', {
-        err: errors
-      })
-    );
-
-    return;
-  }
-
-  let lookupResults = [];
+  const lookupResults = [];
 
   async.eachLimit(
     entities,
@@ -148,85 +128,83 @@ function _createJsonErrorObject(msg, pointer, httpCode, code, title, meta) {
 
 function _lookupEntity(entityObj, options, cb) {
   let relatedCount = parseInt(options.relatedCount) + 1;
-  let uri =
-    'https://en.wikipedia.org/w/api.php?action=opensearch&limit=' +
-    relatedCount +
-    '&namespace=0&format=json&search=' +
-    entityObj.value +
-    '&profile=' +
-    options.profile;
 
-  log.debug({ uri: uri }, 'Checking to see if the query executes');
-
-  requestWithDefaults(
-    {
-      uri: uri,
-      method: 'GET',
-      json: true
+  let requestOptions = {
+    uri: 'https://en.wikipedia.org/w/api.php',
+    qs: {
+      action: 'opensearch',
+      limit: relatedCount,
+      namespace: 0,
+      format: 'json',
+      search: entityObj.value,
+      profile: options.profile.value
     },
-    function(err, response, body) {
-      // check for an error
-      if (err) {
-        log.error({ err: err }, 'Error executing HTTP request');
-        cb({
-          detail: 'Error executing HTTP request',
-          err
-        });
-        return;
-      }
+    method: 'GET',
+    json: true
+  };
 
-      log.debug({ body: body }, 'REST Response Body');
+  log.debug({ requestOptions }, 'Request Options');
 
-      if (response.statusCode !== 200 || _.isUndefined(body) || _.isNull(body) || !_.isArray(body)) {
-        let title = 'Unexpected result format';
-        let code = 'Format error';
-
-        if (_.has(body, 'error.info')) {
-          title = body.error.info;
-        }
-
-        if (_.has(body, 'error.code')) {
-          code = body.error.code;
-        }
-        cb(
-          _createJsonErrorPayload(title, null, '500', '2A', code, {
-            err: body
-          })
-        );
-      } else if (body[3].length == 0) {
-        cb(null, { entity: entityObj, data: null });
-      } else {
-        // The lookup results returned is an array of lookup objects with the following format
-        log.trace({ body: body }, 'Checkign to see if it made it past the error handling');
-        let relatedList = [];
-
-        for (let i = 1; i < body[1].length; i++) {
-          relatedList.push({
-            link: body[3][i],
-            label: body[1][i]
-          });
-        }
-
-        //log.debug({para: body[2][0]}, "checking the paragraph");
-
-        cb(null, {
-          // Required: This is the entity object passed into the integration doLookup method
-          entity: entityObj,
-          displayValue: body[1][0],
-          // Required: An object containing everything you want passed to the template
-          data: {
-            // Required: These are the tags that are displayed in your template
-            summary: [body[1][0]],
-            // Data that you want to pass back to the notification window details block
-            details: {
-              relatedCount: relatedCount,
-              relatedList: relatedList
-            }
-          }
-        });
-      }
+  requestWithDefaults(requestOptions, function(err, response, body) {
+    // check for an error
+    if (err) {
+      log.error({ err: err }, 'Error executing HTTP request');
+      cb({
+        detail: 'Error executing HTTP request',
+        err
+      });
+      return;
     }
-  );
+
+    log.debug({ body: body }, 'REST Response Body');
+
+    if (response.statusCode !== 200 || _.isUndefined(body) || _.isNull(body) || !_.isArray(body)) {
+      let title = 'Unexpected result format';
+      let code = 'Format error';
+
+      if (_.has(body, 'error.info')) {
+        title = body.error.info;
+      }
+
+      if (_.has(body, 'error.code')) {
+        code = body.error.code;
+      }
+      cb(
+        _createJsonErrorPayload(title, null, '500', '2A', code, {
+          err: body
+        })
+      );
+    } else if (body[FIELDS.links].length == 0) {
+      cb(null, { entity: entityObj, data: null });
+    } else {
+      // The lookup results returned is an array of lookup objects with the following format
+      log.trace({ body: body }, 'Checking to see if it made it past the error handling');
+      let relatedList = [];
+
+      for (let i = 0; i < body[FIELDS.matches].length; i++) {
+        relatedList.push({
+          link: body[FIELDS.links][i],
+          label: body[FIELDS.matches][i]
+        });
+      }
+
+      cb(null, {
+        // Required: This is the entity object passed into the integration doLookup method
+        entity: entityObj,
+        displayValue: body[FIELDS.matches][0],
+        // Required: An object containing everything you want passed to the template
+        data: {
+          // Required: These are the tags that are displayed in your template
+          summary: [body[FIELDS.matches][0]],
+          // Data that you want to pass back to the notification window details block
+          details: {
+            relatedCount: relatedCount,
+            relatedList: relatedList
+          }
+        }
+      });
+    }
+  });
 }
 
 module.exports = {
