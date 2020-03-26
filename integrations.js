@@ -179,9 +179,15 @@ function _lookupEntity(entityObj, options, cb) {
     } else {
       // The lookup results returned is an array of lookup objects with the following format
       log.trace({ body: body }, 'Checking to see if it made it past the error handling');
-      let relatedList = [];
 
-      for (let i = 0; i < body[FIELDS.matches].length; i++) {
+      const match = {
+        link: body[FIELDS.links][0],
+        label: body[FIELDS.matches][0]
+      };
+
+      const relatedList = [];
+
+      for (let i = 1; i < body[FIELDS.matches].length; i++) {
         relatedList.push({
           link: body[FIELDS.links][i],
           label: body[FIELDS.matches][i]
@@ -198,8 +204,9 @@ function _lookupEntity(entityObj, options, cb) {
           summary: [body[FIELDS.matches][0]],
           // Data that you want to pass back to the notification window details block
           details: {
-            relatedCount: relatedCount,
-            relatedList: relatedList
+            relatedCount,
+            relatedList,
+            match
           }
         }
       });
