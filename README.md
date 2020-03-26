@@ -1,6 +1,6 @@
 # Polarity Wikipedia Integration
 
-Polarity's Wikipedia integration gives users access to a short description of Wikipedia entries that match a tagged entity.
+Polarity's Wikipedia integration gives users access to a list of searches related to a tagged entity.
 
 | ![image](https://user-images.githubusercontent.com/22529325/76760849-c9e77080-6764-11ea-821a-f6b876b28d56.png) |
 |---|
@@ -14,7 +14,7 @@ There are two main settings in the Wikipedia integration:
 
 ### Search Profile
 
-Accepts a text string for one of the four support search profiles.  Valid values are:
+Set the value to one of the four supported search profiles.  Valid values are:
 
 #### fuzzy
 Default search, supports typo correction.
