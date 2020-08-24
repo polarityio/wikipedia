@@ -41,6 +41,9 @@ module.exports = {
      */
     rejectUnauthorized: true
   },
+  logging: {
+    level: 'info'
+  },
   options: [
     {
       key: 'profile',
