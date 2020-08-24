@@ -75,7 +75,6 @@ function doLookup(entities, options, cb) {
     20,
     function(entityObj, next) {
       if (
-        entityObj.type == 'string' &&
         entityNoSpecialChars.test(entityObj.value) &&
         !entityNotGeo.test(entityObj.value)
       ) {

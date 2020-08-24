@@ -1,9 +1,15 @@
 module.exports = {
   name: 'Wikipedia',
   acronym: 'Wiki',
-  logging: { level: 'info' },
   styles: ['./styles/wiki.less'],
-  entityTypes: ['string'],
+  entityTypes: [],
+  customTypes: [
+    {
+      key: 'wikiString',
+      regex: /[\s\S]*/
+    }
+  ],
+  onDemandOnly: true,
   block: {
     component: {
       file: './components/wiki.js'
