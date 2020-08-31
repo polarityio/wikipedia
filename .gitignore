@@ -9,6 +9,9 @@
 *.sublime-project
 *.sublime-workspace
 sftp-config.json
+sftp.json
+*.vscode
+*.history
 
 # Ignore Eclipse Project Information
 *.settings

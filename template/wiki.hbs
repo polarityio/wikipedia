@@ -1,21 +1,14 @@
-<div class="description">
-    <p>
-        {{#if block.data.details.para}}
-            {{block.data.details.para}}
-        {{/if}}
-    </p>
+<h1 class="p-title">{{fa-icon "search" fixedWidth=true}} Search Result</h1>
+<div>
+  <span class="p-key">Article: </span>
+  <span class="p-value"><a class="p-link" href="{{details.match.link}}">{{details.match.label}} {{fa-icon "external-link" class="external-link-icon"}}</a></span>
 </div>
-{{#if block.data.details.relatedList}}
-    <div class="lists">
-        <p>
-            <i class="fa fa-bold fa-wikipedia-w"></i><span class="lists"> Related Searches</span>
-        </p>
-
-            <ul>
-			{{#each block.data.details.relatedList as |item|}}
-                    <li><a href="{{item.link}}"> {{item.label}}</a></li>
-			{{/each}}
-            </ul>
-
-    </div>
+{{#if (gt details.relatedList.length 0)}}
+  <h1 class="p-title">{{fa-icon "link" fixedWidth=true}} Related Wikipedia Articles</h1>
+  <ul class="link-list">
+    {{#each details.relatedList as |item|}}
+      <li><a class="p-link" href="{{item.link}}">{{item.label}}</a></li>
+    {{/each}}
+  </ul>
 {{/if}}
+
