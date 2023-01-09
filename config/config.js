@@ -3,6 +3,7 @@ module.exports = {
   acronym: 'Wiki',
   styles: ['./styles/wiki.less'],
   entityTypes: [],
+  defaultColor: 'light-gray',
   customTypes: [
     {
       key: 'wikiString',
