@@ -1,0 +1,76 @@
+{
+  "name": "Wikipedia",
+  "acronym": "Wiki",
+  "styles": [
+    "./styles/wiki.less"
+  ],
+  "entityTypes": [],
+  "customTypes": [
+    {
+      "key": "wikiString",
+      "regex": "[\\s\\S]*"
+    }
+  ],
+  "onDemandOnly": true,
+  "block": {
+    "component": {
+      "file": "./components/wiki.js"
+    },
+    "template": {
+      "file": "./template/wiki.hbs"
+    }
+  },
+  "request": {
+    "cert": "",
+    "key": "",
+    "passphrase": "",
+    "ca": "",
+    "proxy": "",
+    "rejectUnauthorized": true
+  },
+  "logging": {
+    "level": "info"
+  },
+  "options": [
+    {
+      "key": "profile",
+      "name": "Search Profile",
+      "description": "Specify the search profile for Wikipedia Open Search. Options are: 'strict', 'normal', 'fuzzy' or 'classic'",
+      "default": {
+        "value": "strict",
+        "display": "Strict"
+      },
+      "type": "select",
+      "options": [
+        {
+          "value": "strict",
+          "display": "Strict"
+        },
+        {
+          "value": "normal",
+          "display": "Normal"
+        },
+        {
+          "value": "fuzzy",
+          "display": "Fuzzy"
+        },
+        {
+          "value": "classic",
+          "display": "Classic"
+        }
+      ],
+      "multiple": false,
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "relatedCount",
+      "name": "Related Topics",
+      "description": "The number of related wiki topics to show.",
+      "default": 5,
+      "type": "number",
+      "userCanEdit": true,
+      "adminOnly": false
+    }
+  ]
+}
