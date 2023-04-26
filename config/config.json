@@ -1,4 +1,5 @@
 {
+  "polarityIntegrationUuid": "6a616760-e448-11ed-adcd-e599fe5114fe",
   "name": "Wikipedia",
   "acronym": "Wiki",
   "styles": ["./styles/wiki.less"],
