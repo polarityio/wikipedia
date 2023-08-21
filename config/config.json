@@ -2,13 +2,15 @@
   "polarityIntegrationUuid": "6a616760-e448-11ed-adcd-e599fe5114fe",
   "name": "Wikipedia",
   "acronym": "Wiki",
-  "styles": ["./styles/wiki.less"],
+  "styles": [
+    "./styles/wiki.less"
+  ],
   "entityTypes": [],
   "defaultColor": "light-gray",
   "customTypes": [
     {
       "key": "wikiString",
-      "regex": "[\\s\\S]*"
+      "regex": "\\S[\\s\\S]{2,2048}\\S"
     }
   ],
   "onDemandOnly": true,
