@@ -7,7 +7,7 @@ module.exports = {
   customTypes: [
     {
       key: 'wikiString',
-      regex: /[\s\S]*/
+      regex: /\S[\s\S]{2,2048}\S/
     }
   ],
   onDemandOnly: true,
